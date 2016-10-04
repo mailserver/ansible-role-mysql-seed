@@ -1,0 +1,13 @@
+---
+
+- name: remote temp dir for schema and seed exists
+  file:
+    path: "{{ seed_remote_temp_dir }}"
+    state: directory
+    mode: 0700
+
+- include: install.Debian.yml
+  when: (ansible_distribution == "Debian") or (ansible_distribution == "Ubuntu")
+
+- include: install.FreeBSD.yml
+  when: (ansible_distribution == "FreeBSD")

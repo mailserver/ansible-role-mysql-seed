@@ -1,0 +1,89 @@
+
+USE `{{ _seed_mysql.database }}`;
+
+CREATE TABLE IF NOT EXISTS `domain`
+(
+  `domain` VARCHAR(255) PRIMARY KEY,
+  `dkim_public_key` TEXT,
+  `dkim_private_key` TEXT,
+  `dkim_selector` VARCHAR(255) DEFAULT NULL,
+  `greylisting` tinyint(1) DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS `alias`
+(
+  `alias` VARCHAR(255),
+  `mail` VARCHAR(255),
+  `greylisting` tinyint(1) DEFAULT NULL,
+  CONSTRAINT `pk` PRIMARY KEY (`alias`,`mail`)
+);
+
+CREATE TABLE IF NOT EXISTS `account`
+(
+  `mail` VARCHAR(255) PRIMARY KEY,
+  `home` VARCHAR(255),
+  `passwd` VARCHAR(255),
+  `home_quota_storage` varchar(255) DEFAULT NULL
+);
+
+CREATE OR REPLACE VIEW `virtual_alias_maps` AS
+SELECT 
+  `alias`, 
+  GROUP_CONCAT(`mail` SEPARATOR ',') AS `destination`
+FROM `alias`
+GROUP BY `alias`;
+
+CREATE OR REPLACE VIEW `virtual_mailbox_maps` AS
+SELECT 
+  `mail` 
+FROM `account`;
+
+CREATE OR REPLACE VIEW `alias_user_maps` AS
+SELECT
+  `u`.`mail` AS `alias`,
+  `u`.`mail` AS `user`
+FROM `account` `u`
+UNION ALL
+SELECT
+  `a`.`alias` AS `alias`,
+  `a`.`mail` AS `user`
+FROM `alias` `a`
+JOIN `account` `u`
+ON `a`.`mail` = `u`.`mail`;
+
+CREATE OR REPLACE VIEW `alias_users_maps` AS
+SELECT 
+  `alias`,
+  GROUP_CONCAT(`user` SEPARATOR ',') as `users`
+FROM `alias_user_maps`
+GROUP BY `alias`;
+
+{% if _seed_config.features.opendkim.enabled %}
+USE `{{ _seed_config.features.opendkim.mysql.database }}`;
+
+CREATE OR REPLACE VIEW `opendkim` AS
+SELECT * FROM `{{ _seed_mysql.database }}.domain`
+WHERE 
+  (`dkim_private_key` != '' AND `dkim_private_key` IS NOT NULL)
+  AND
+  (`dkim_selector` != '' AND `dkim_selector` IS NOT NULL);
+{% endif %}
+
+{% if _seed_config.features.sqlgrey.enabled == true %}
+USE `{{ _seed_config.features.sqlgrey.mysql.database }}`;
+
+CREATE OR REPLACE VIEW `optin_domain` AS
+SELECT `d`.`domain` as `domain`
+FROM `mail`.`domain` AS `d`
+WHERE `d`.`greylisting` = 1;
+
+CREATE OR REPLACE VIEW `optin_email` AS
+SELECT `a`.`alias` as `email`
+FROM `mail`.`alias` as `a`
+WHERE `a`.`greylisting` = 1;
+
+CREATE OR REPLACE VIEW `optout_email` AS
+SELECT `a`.`alias` as `email`
+FROM `mail`.`alias` as `a`
+WHERE `a`.`greylisting` = 0;
+{% endif %}

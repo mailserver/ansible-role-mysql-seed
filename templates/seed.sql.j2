@@ -1,0 +1,27 @@
+{% if (_seed_config.accounts | length) > 0 %}
+INSERT INTO `account` (`mail`, `home`, `passwd`)
+VALUES
+{% for account in _seed_config.accounts %}
+  ('{{ account.user }}@{{ account.domain }}', '{{ account.user }}', '{{ account.user_password }}'),
+{% endfor %}
+;
+{% endif %}
+
+{% if ((_seed_config.aliases | length) + (_seed_config.accounts | length)) > 0 %}
+INSERT INTO `alias` (`alias`, `mail`)
+VALUES
+{% for account in _seed_config.accounts %}
+  ('{{ account.user }}@{{ account.domain }}', '{{ account.user }}@{{ account.domain }}'),
+{% endfor %}
+{% for alias in _seed_config.aliases %}
+  ('{{ alias.from }}', '{{ alias.to }}'),
+{% endfor %}
+  ('postmaster@{{ seed_virtual_domain }}', '{{ seed_postmaster_address }}')
+;
+{% endif %}
+
+INSERT INTO `domain` (`domain`)
+VALUES
+  ('{{ virtual_domain }}')
+;
+

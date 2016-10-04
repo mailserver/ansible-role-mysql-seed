@@ -1,0 +1,24 @@
+---
+
+seed_remote_temp_dir: '/root/ansible_mailserver_database'
+
+seed_default_mysql:
+  host: "127.0.0.1"
+  port: 3306
+  user: "root"
+  password: ""
+  database: "mail"
+
+seed_default_config:
+  virtual_domain: 'example.com'
+  postmaster_address: 'postmaster@{{ seed_virtual_domain }}'
+  accounts: []
+  aliases: []
+  features:
+    opendkim:
+      enabled: true
+      mysql: "{{ seed_default_config }}"
+    sqlgrey:
+      enabled: true
+      # SQLgrey uses a separate database
+      mysql: "{{ seed_default_config | combine({ database: 'sqlgrey' }) }}"

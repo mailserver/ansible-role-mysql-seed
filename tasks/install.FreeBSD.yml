@@ -1,0 +1,9 @@
+---
+
+- name: helper tools are installed
+  pkgng:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - mariadb101-client
+    - py27-mysql-connector-python2

@@ -1,0 +1,13 @@
+---
+
+- name: database seed is uploaded
+  template:
+    src: "seed.sql.j2"
+    dest: "{{ seed_remote_temp_dir }}/seed.sql"
+  register: _seed_seed_uploaded
+
+- name: database seed is spplied
+  shell: mysql -h "{{ _seed_mysql.host }}"
+          --user="{{ _seed_mysql.user }}"
+          --password={{ _seed_mysql.password }}
+          < "{{ seed_remote_temp_dir }}/seed.sql"

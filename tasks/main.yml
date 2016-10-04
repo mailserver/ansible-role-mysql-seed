@@ -1,0 +1,11 @@
+---
+
+- set_fact: _seed_mysql="{{ seed_default_mysql | combine(seed_mysql, recursive=True) }}"
+  no_log: true
+
+- set_fact: _seed_config="{{ seed_default_config | combine(seed_config, recursive=True) }}"
+  no_log: true
+
+- include: prepare.yml
+- include: schema.yml
+- include: seed.yml

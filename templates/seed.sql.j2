@@ -1,8 +1,10 @@
+USE `{{ _seed_mysql.database }}`;
+
 {% if (_seed_config.accounts | length) > 0 %}
 INSERT INTO `account` (`mail`, `home`, `passwd`)
 VALUES
 {% for account in _seed_config.accounts %}
-  ('{{ account.user }}@{{ account.domain }}', '{{ account.user }}', '{{ account.user_password }}'),
+  ('{{ account.mail }}', '{{ account.home }}', '{{ account.password }}'){% if not loop.last %},{% endif %}
 {% endfor %}
 ;
 {% endif %}
@@ -11,17 +13,17 @@ VALUES
 INSERT INTO `alias` (`alias`, `mail`)
 VALUES
 {% for account in _seed_config.accounts %}
-  ('{{ account.user }}@{{ account.domain }}', '{{ account.user }}@{{ account.domain }}'),
+  ('{{ account.mail }}', '{{ account.mail }}'),
 {% endfor %}
 {% for alias in _seed_config.aliases %}
   ('{{ alias.from }}', '{{ alias.to }}'),
 {% endfor %}
-  ('postmaster@{{ seed_virtual_domain }}', '{{ seed_postmaster_address }}')
+  ('postmaster@{{ _seed_config.virtual_domain }}', '{{ _seed_config.postmaster_address }}')
 ;
 {% endif %}
 
 INSERT INTO `domain` (`domain`)
 VALUES
-  ('{{ virtual_domain }}')
+  ('{{ _seed_config.virtual_domain }}')
 ;
 

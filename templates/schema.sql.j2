@@ -1,4 +1,3 @@
-
 USE `{{ _seed_mysql.database }}`;
 
 CREATE TABLE IF NOT EXISTS `domain`
@@ -62,7 +61,7 @@ GROUP BY `alias`;
 USE `{{ _seed_config.features.opendkim.mysql.database }}`;
 
 CREATE OR REPLACE VIEW `opendkim` AS
-SELECT * FROM `{{ _seed_mysql.database }}.domain`
+SELECT * FROM `domain`
 WHERE 
   (`dkim_private_key` != '' AND `dkim_private_key` IS NOT NULL)
   AND
@@ -74,16 +73,16 @@ USE `{{ _seed_config.features.sqlgrey.mysql.database }}`;
 
 CREATE OR REPLACE VIEW `optin_domain` AS
 SELECT `d`.`domain` as `domain`
-FROM `mail`.`domain` AS `d`
+FROM `{{ _seed_mysql.database }}`.`domain` AS `d`
 WHERE `d`.`greylisting` = 1;
 
 CREATE OR REPLACE VIEW `optin_email` AS
 SELECT `a`.`alias` as `email`
-FROM `mail`.`alias` as `a`
+FROM `{{ _seed_mysql.database }}`.`alias` as `a`
 WHERE `a`.`greylisting` = 1;
 
 CREATE OR REPLACE VIEW `optout_email` AS
 SELECT `a`.`alias` as `email`
-FROM `mail`.`alias` as `a`
+FROM `{{ _seed_mysql.database }}`.`alias` as `a`
 WHERE `a`.`greylisting` = 0;
 {% endif %}

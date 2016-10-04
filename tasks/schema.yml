@@ -6,7 +6,7 @@
     dest: "{{ seed_remote_temp_dir }}/schema.sql"
   register: _seed_schema_uploaded
 
-- name: database schema is spplied
+- name: database schema is applied
   shell: mysql -h "{{ _seed_mysql.host }}"
           --user="{{ _seed_mysql.user }}"
           --password={{ _seed_mysql.password }}

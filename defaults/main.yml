@@ -11,14 +11,14 @@ seed_default_mysql:
 
 seed_default_config:
   virtual_domain: 'example.com'
-  postmaster_address: 'postmaster@{{ seed_virtual_domain }}'
+  postmaster_address: 'postmaster@example.com'
   accounts: []
   aliases: []
   features:
     opendkim:
       enabled: true
-      mysql: "{{ seed_default_config }}"
+      mysql: "{{ _seed_mysql }}"
     sqlgrey:
       enabled: true
       # SQLgrey uses a separate database
-      mysql: "{{ seed_default_config | combine({ database: 'sqlgrey' }) }}"
+      mysql: "{{ _seed_mysql | combine({ 'database': 'sqlgrey' }) }}"

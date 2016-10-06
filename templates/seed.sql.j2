@@ -22,8 +22,9 @@ VALUES
 ;
 {% endif %}
 
-REPLACE INTO `domain` (`domain`)
+INSERT INTO `domain` (`domain`)
 VALUES
   ('{{ _seed_config.virtual_domain }}')
+ON DUPLICATE KEY UPDATE domain=domain
 ;
 

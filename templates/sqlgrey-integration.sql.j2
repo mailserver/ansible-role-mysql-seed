@@ -1,0 +1,14 @@
+GRANT SELECT
+  ON `{{ _seed_mysql.database }}`.`alias` 
+  TO `{{ _seed_config.features.sqlgrey.mysql.database }}`@`%`;
+
+USE `{{ _seed_config.features.sqlgrey.mysql.database }}`;
+
+CREATE OR REPLACE VIEW optin_email AS
+SELECT alias AS email FROM `tm1_mail`.`alias` WHERE greylisting = 1;
+
+CREATE OR REPLACE VIEW optout_email AS
+SELECT alias AS email FROM `tm1_mail`.`alias` WHERE greylisting = 0;
+
+CREATE OR REPLACE VIEW optin_domain AS
+SELECT domain FROM `tm1_mail`.`domain` WHERE greylisting = 1;

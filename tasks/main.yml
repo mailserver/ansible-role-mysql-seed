@@ -8,4 +8,6 @@
 
 - include: prepare.yml
 - include: schema.yml
+- include: sqlgrey.yml
+  when: _seed_config.features.sqlgrey.enabled == true
 - include: seed.yml

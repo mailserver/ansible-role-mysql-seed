@@ -6,10 +6,11 @@
   template:
     src: "sqlgrey-integration.sql.j2"
     dest: "{{ seed_remote_temp_dir }}/sqlgrey-integration.sql"
-  register: _seed_seed_uploaded
+  register: _sqlgrey_integration_schema_uploaded
 
 - name: sqlgrey has shared access to the main mail database
   shell: mysql -h "{{ _seed_mysql.host }}"
           --user="{{ _seed_mysql.user }}"
           --password={{ _seed_mysql.password }}
           < "{{ seed_remote_temp_dir }}/sqlgrey-integration.sql"
+  when: _sqlgrey_integration_schema_uploaded.changed

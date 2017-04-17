@@ -27,4 +27,12 @@ VALUES
   ('{{ _seed_config.virtual_domain }}')
 ON DUPLICATE KEY UPDATE domain=domain
 ;
-
+{% if (_seed_config.transports | length) > 0 %}
+INSERT INTO `domain` (`domain`, `transport`)
+VALUES
+{% for transport in _seed_config.transports %}
+  ('{{ transport.domain }}', '{{ transport.transport }}')
+{% endfor %}
+ON DUPLICATE KEY UPDATE domain=domain
+;
+{% endif %}
